@@ -1,6 +1,6 @@
 """
 Seed database with sample data for TrailService (CW2 Schema)
-This script populates the CW2 schema with test data for development and demonstration.
+This script populates the CW2 schema with test data matching the SQL schema.
 """
 import sys
 import os
@@ -62,9 +62,7 @@ def seed_database():
         countries = [
             ("United Kingdom",),
             ("United States",),
-            ("Australia",),
-            ("Canada",),
-            ("Germany",)
+            ("Australia",)
         ]
         for country in countries:
             db.execute_update(
@@ -78,9 +76,7 @@ def seed_database():
             ("Plymouth", 1),  # UK
             ("London", 1),    # UK
             ("New York", 2),  # US
-            ("Sydney", 3),    # Australia
-            ("Toronto", 4),   # Canada
-            ("Berlin", 5)     # Germany
+            ("Sydney", 3)     # Australia
         ]
         for city in cities:
             db.execute_update(
@@ -93,10 +89,7 @@ def seed_database():
         locations = [
             ("Plymbridge Woods", 1, 1, "50.3964,-4.0916"),
             ("Central Park", 3, 2, "40.7851,-73.9683"),
-            ("Dartmoor National Park", 1, 1, "50.5700,-3.9200"),
-            ("Sydney Harbour", 4, 3, "-33.8568,151.2153"),
-            ("Rocky Mountains", None, 4, "51.1784,-115.5708"),
-            ("Black Forest", 6, 5, "48.3325,8.1667")
+            ("Dartmoor National Park", 1, 1, "50.5700,-3.9200")
         ]
         for location in locations:
             db.execute_update(
@@ -114,23 +107,21 @@ def seed_database():
         ]
         for user in users:
             db.execute_update(
-                "INSERT INTO CW2.[User] (Username, Email, Role) VALUES (?, ?, ?)",
-                user
+                "INSERT INTO CW2.[User] (Username, Email, Role, CreatedAt) VALUES (?, ?, ?, ?)",
+                (*user, datetime.now())
             )
         
         # 5. Insert Features
         print("Inserting features...")
         features = [
-            ("Waterfall", "Trail passes by or includes a waterfall"),
-            ("Forest", "Mainly through wooded areas"),
-            ("River View", "Scenic views of rivers or streams"),
-            ("Mountain View", "Panoramic mountain vistas"),
-            ("Wildlife", "Good spot for animal watching"),
-            ("Picnic Area", "Designated picnic spots"),
-            ("Parking", "Available parking at trailhead"),
-            ("Toilets", "Public toilets available"),
-            ("Camping", "Camping facilities available"),
-            ("Historic Site", "Historical landmarks along trail")
+            ("Waterfall", "Trail passes by or includes a waterfall", None),
+            ("Forest", "Mainly through wooded areas", None),
+            ("River View", "Scenic views of rivers or streams", None),
+            ("Mountain View", "Panoramic mountain vistas", None),
+            ("Wildlife", "Good spot for animal watching", None),
+            ("Picnic Area", "Designated picnic spots", None),
+            ("Parking", "Available parking at trailhead", None),
+            ("Toilets", "Public toilets available", None)
         ]
         for feature in features:
             db.execute_update(
@@ -145,9 +136,11 @@ def seed_database():
         trail1_query = """
         INSERT INTO CW2.Trail (
             TrailName, LocationID, Difficulty, Length, ElevationGain,
-            EstTimeMin, EstTimeMax, RouteType, Description, UserID, IsPublic
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            EstTimeMin, EstTimeMax, RouteType, Description, UserID, IsPublic,
+            CreatedAt, UpdatedAt
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
+        current_time = datetime.now()
         trail1_values = (
             "Plymbridge Circular Walk",
             1,  # Plymbridge Woods
@@ -157,197 +150,82 @@ def seed_database():
             90,
             120,
             "Loop",
-            "A beautiful circular walk through Plymbridge Woods along the River Plym. Perfect for families and casual walkers. The trail offers stunning river views and passes through ancient woodland.",
+            "A beautiful circular walk through Plymbridge Woods along the River Plym. Perfect for families and casual walkers.",
             1,  # Ada Lovelace (admin)
-            1
+            1,  # IsPublic
+            current_time,
+            current_time
         )
         trail1_id = db.execute_update(trail1_query, trail1_values)
-        print(f"      Created trail #{trail1_id}: Plymbridge Circular Walk")
+        print(f"  Created trail #{trail1_id}: Plymbridge Circular Walk")
         
-        # Trail 2: Dartmoor Challenge
-        trail2_values = (
-            "Dartmoor Challenge Route",
-            3,  # Dartmoor National Park
-            "Hard",
-            15.8,
-            650,
-            300,
-            420,
-            "Point-to-point",
-            "A challenging hike across Dartmoor National Park with breathtaking moorland views. Not for beginners - proper hiking gear and navigation skills required.",
-            2,  # Tim Berners-Lee
-            1
-        )
-        trail2_id = db.execute_update(trail1_query, trail2_values)
-        print(f"      Created trail #{trail2_id}: Dartmoor Challenge Route")
+        # Get the TrailID we just inserted
+        if not trail1_id:
+            # If execute_update doesn't return ID, fetch it
+            result = db.execute_query("SELECT MAX(TrailID) as max_id FROM CW2.Trail")
+            trail1_id = result[0]['max_id'] if result else 1
         
-        # Trail 3: Central Park Stroll
-        trail3_values = (
-            "Central Park Stroll",
-            2,  # Central Park
-            "Easy",
-            2.1,
-            25,
-            45,
-            60,
-            "Out & back",
-            "A gentle stroll through New York's Central Park. Perfect for a quick escape from the city bustle. Family and wheelchair friendly.",
-            3,  # Ada Lovelace (user)
-            1
-        )
-        trail3_id = db.execute_update(trail1_query, trail3_values)
-        print(f"      Created trail #{trail3_id}: Central Park Stroll")
-        
-        # Trail 4: Private Test Trail
-        trail4_values = (
-            "Private Test Trail",
-            5,  # Rocky Mountains
-            "Moderate",
-            8.5,
-            320,
-            180,
-            240,
-            "Loop",
-            "A private trail for testing purposes only. Not visible to public users.",
-            4,  # William Frost
-            0   # IsPublic = False
-        )
-        trail4_id = db.execute_update(trail1_query, trail4_values)
-        print(f"      Created trail #{trail4_id}: Private Test Trail (hidden)")
-        
-        # 7. Add Trail Points
+        # 7. Add Trail Points for the trail
         print("Adding trail points...")
-        
-        # Points for Trail 1
-        trail1_points = [
-            (trail1_id, 1, 50.3964, -4.0916, "Trail Start - Plymbridge Car Park", 50.0),
-            (trail1_id, 2, 50.3972, -4.0923, "River Viewpoint - Great photo spot", 48.5),
-            (trail1_id, 3, 50.3985, -4.0938, "Woodland Section - Ancient trees", 52.0),
-            (trail1_id, 4, 50.3991, -4.0952, "Highest Point - View over valley", 55.5),
-            (trail1_id, 5, 50.3964, -4.0916, "Trail End - Return to car park", 50.0)
+        trail_points = [
+            (trail1_id, 1, 50.3964, -4.0916, "Trail Start - Plymbridge Car Park", None, current_time),
+            (trail1_id, 2, 50.3972, -4.0923, "River Viewpoint - Great photo spot", None, current_time),
+            (trail1_id, 3, 50.3985, -4.0938, "Woodland Section - Ancient trees", None, current_time),
+            (trail1_id, 4, 50.3991, -4.0952, "Highest Point - View over valley", None, current_time),
+            (trail1_id, 5, 50.3964, -4.0916, "Trail End - Return to car park", None, current_time)
         ]
         
-        # Points for Trail 2
-        trail2_points = [
-            (trail2_id, 1, 50.5700, -3.9200, "Start - Princetown", 450.0),
-            (trail2_id, 2, 50.5750, -3.9150, "Great Mis Tor", 520.0),
-            (trail2_id, 3, 50.5800, -3.9100, "North Hessary Tor", 510.0),
-            (trail2_id, 4, 50.5850, -3.9050, "Finish - Postbridge", 440.0)
-        ]
-        
-        all_points = trail1_points + trail2_points
-        for point in all_points:
+        for point in trail_points:
             db.execute_update(
-                "INSERT INTO CW2.Trail_Point (TrailID, PointOrder, Latitude, Longitude, Description, Elevation) VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO CW2.Trail_Point (TrailID, PointOrder, Latitude, Longitude, Description, Elevation, CreatedAt) VALUES (?, ?, ?, ?, ?, ?, ?)",
                 point
             )
-        print(f"Added {len(all_points)} trail points")
         
-        # 8. Link Features to Trails
+        # 8. Link Features to Trail
         print("Linking features to trails...")
-        
-        # Trail 1 features
-        trail1_features = [
-            (trail1_id, 2, 1),  # Forest
-            (trail1_id, 3, 1),  # River View
-            (trail1_id, 6, 1),  # Picnic Area
-            (trail1_id, 7, 1),  # Parking
-            (trail1_id, 8, 1)   # Toilets
+        trail_features = [
+            (trail1_id, 2, 1, current_time),  # Forest
+            (trail1_id, 3, 1, current_time),  # River View
+            (trail1_id, 6, 1, current_time),  # Picnic Area
+            (trail1_id, 7, 1, current_time)   # Parking
         ]
         
-        # Trail 2 features
-        trail2_features = [
-            (trail2_id, 4, 2),  # Mountain View
-            (trail2_id, 5, 2),  # Wildlife
-            (trail2_id, 9, 2)   # Camping
-        ]
-        
-        # Trail 3 features
-        trail3_features = [
-            (trail3_id, 2, 3),  # Forest
-            (trail3_id, 6, 3),  # Picnic Area
-            (trail3_id, 7, 3),  # Parking
-            (trail3_id, 8, 3),  # Toilets
-            (trail3_id, 10, 3)  # Historic Site
-        ]
-        
-        all_features = trail1_features + trail2_features + trail3_features
-        for feature in all_features:
+        for feature in trail_features:
             db.execute_update(
-                "INSERT INTO CW2.Trail_Feature (TrailID, FeatureID, AddedBy) VALUES (?, ?, ?)",
+                "INSERT INTO CW2.Trail_Feature (TrailID, FeatureID, AddedBy, AddedAt) VALUES (?, ?, ?, ?)",
                 feature
             )
-        print(f"Added {len(all_features)} feature links")
         
-        # 9. Add Reviews
+        # 9. Add a Review
         print("Adding reviews...")
-        
-        reviews = [
-            (trail1_id, 3, 5, "Beautiful walk! Perfect for a sunny afternoon. The river views are stunning. Family-friendly and well-maintained."),
-            (trail1_id, 4, 4, "Great trail for beginners. Would be 5 stars if there were more signposts."),
-            (trail2_id, 1, 5, "Challenging but rewarding! The moorland views are incredible. Make sure to bring a map and compass."),
-            (trail2_id, 5, 3, "Very difficult trail. Not for casual hikers. Views were amazing though."),
-            (trail3_id, 2, 4, "Perfect escape in the middle of the city. Busy on weekends but worth it.")
-        ]
-        
-        for review in reviews:
-            db.execute_update(
-                "INSERT INTO CW2.Review (TrailID, UserID, Rating, ReviewText) VALUES (?, ?, ?, ?)",
-                review
-            )
-        print(f"Added {len(reviews)} reviews")
+        review_values = (
+            trail1_id,
+            3,  # UserID: Ada Lovelace (user)
+            5,
+            "Beautiful walk! Perfect for a sunny afternoon. The river views are stunning.",
+            current_time,
+            0
+        )
+        db.execute_update(
+            "INSERT INTO CW2.Review (TrailID, UserID, Rating, ReviewText, DateReviewed, IsHelpful) VALUES (?, ?, ?, ?, ?, ?)",
+            review_values
+        )
         
         # 10. Add Weather Data
         print("Adding weather data...")
+        weather_values = (
+            trail1_id,
+            15.5,
+            "Partly Cloudy",
+            current_time,
+            current_time.date()
+        )
+        db.execute_update(
+            "INSERT INTO CW2.Weather (TrailID, Temperature, Condition, RecordedAt, ForecastDate) VALUES (?, ?, ?, ?, ?)",
+            weather_values
+        )
         
-        weather_data = [
-            (trail1_id, 15.5, "Partly Cloudy", "2023-11-25"),
-            (trail2_id, 12.0, "Sunny", "2023-11-25"),
-            (trail3_id, 18.0, "Clear", "2023-11-25")
-        ]
-        
-        for weather in weather_data:
-            db.execute_update(
-                "INSERT INTO CW2.Weather (TrailID, Temperature, Condition, ForecastDate) VALUES (?, ?, ?, ?)",
-                weather
-            )
-        print("Added weather forecasts")
-        
-        # 11. Add Photos
-        print("Adding sample photos...")
-        
-        photos = [
-            (trail1_id, 3, "https://www.exploredevon.info/wp-content/uploads/2014/05/Plym-Bridge-Chris-Downer-geograph.org_.uk_.jpg", "River view from the trail", 1),
-            (trail1_id, 4, "https://eu-assets.simpleview-europe.com/plymouth2016/imageresizer/?image=%2Fdmsimgs%2Fimage00008_621582239.jpeg&action=ProductDetailNew", "Ancient oak tree", 1),
-            (trail2_id, 1, "https://www.sykescottages.co.uk/inspiration/wp-content/uploads/Hound-Tor-1.jpg", "Moorland panorama", 1),
-            (trail3_id, 2, "https://d2wsrtli9cxkek.cloudfront.net/media/images/locations/TheLake-20190908.jpg?auto=compress%2Cformat&crop=focalpoint&fit=crop&fp-x=0.5583&fp-y=0.6018&h=1151.1627906977&q=80&w=2475&s=e1abae18259cb8603efdc29ad7fb4556", "Central Park lake", 1)
-        ]
-        
-        for photo in photos:
-            db.execute_update(
-                "INSERT INTO CW2.Photo (TrailID, UserID, PhotoURL, Caption, IsApproved) VALUES (?, ?, ?, ?, ?)",
-                photo
-            )
-        print(f"Added {len(photos)} photos")
-        
-        # 12. Add User Activity Logs
-        print("Adding user activity logs...")
-        
-        activities = [
-            (1, "LOGIN", "User logged into the system"),
-            (2, "TRAIL_CREATE", "Created new trail"),
-            (3, "REVIEW_POST", "Posted a trail review"),
-            (4, "PHOTO_UPLOAD", "Uploaded trail photo")
-        ]
-        
-        for activity in activities:
-            db.execute_update(
-                "INSERT INTO CW2.User_Activity (UserID, ActivityType, Details) VALUES (?, ?, ?)",
-                activity
-            )
-        print("Added user activity logs")
-        
-        # 13. Verify Data
+        # 11. Verify Data
         print("\nDatabase seeded successfully!")
         print("\nVerification Summary:")
         
@@ -355,7 +233,7 @@ def seed_database():
         tables_to_check = [
             "Country", "City", "Location", "[User]", "Trail", 
             "Trail_Point", "Feature", "Trail_Feature", 
-            "Review", "Photo", "Weather", "User_Activity"
+            "Review", "Weather"
         ]
         
         for table in tables_to_check:
@@ -363,8 +241,8 @@ def seed_database():
                 result = db.execute_query(f"SELECT COUNT(*) as count FROM CW2.{table}")
                 count = result[0]['count'] if result else 0
                 print(f"   {table}: {count} records")
-            except:
-                print(f"   {table}: Error counting")
+            except Exception as e:
+                print(f"   {table}: Error - {e}")
         
         # Test views
         print("\nTesting views:")
@@ -391,11 +269,13 @@ def seed_database():
         print("SEEDING COMPLETE!")
         print("=" * 60)
         print("\nSample Data Summary:")
-        print("   • 3 Public trails, 1 Private trail")
-        print("   • 6 Users (2 admins, 4 regular users)")
-        print("   • 5 Locations with coordinates")
-        print("   • 10 Trail features")
-        print("   • Multiple reviews, photos, and weather entries")
+        print("   • 1 Trail with complete data")
+        print("   • 4 Users (2 admins, 2 regular users)")
+        print("   • 3 Locations with coordinates")
+        print("   • 8 Trail features")
+        print("   • 5 Trail points")
+        print("   • 1 Review")
+        print("   • 1 Weather forecast")
         print("\nReady to start the API with: python run.py")
         
         return True
