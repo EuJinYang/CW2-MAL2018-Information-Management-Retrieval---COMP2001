@@ -5,9 +5,10 @@ MAL2018 Information Management &amp; Retrieval - COMP2001 Assessment 2 [Trail Mi
 
 ### Prerequisites
 - Python 3.9+
-- SQL Server access (dist-6-505.uopnet.plymouth.ac.uk)
+- SQL Server access (localhost)
 - ODBC Driver 17 for SQL Server
 - External Authenticator API access
+- Azure Data Studio
 
 ### Installation & Running
 1. **Clone and setup:**
@@ -30,4 +31,5 @@ MAL2018 Information Management &amp; Retrieval - COMP2001 Assessment 2 [Trail Mi
 4. **Access the API**
    ```bash
    Swagger Documentation: http://localhost:5000/docs
+
    FastAPI Documentation: http://localhost:5000/redocs
