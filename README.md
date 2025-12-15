@@ -41,42 +41,42 @@ MAL2018 Information Management &amp; Retrieval - COMP2001 Assessment 2 [Trail Mi
 
    FastAPI Documentation: http://localhost:5000/redoc
 
-5. **Sample Data**
+5. **Sample Data to Test in Swagger Documentation**
    ```bash
    Create Trail (POST):
    {
-   "trail_name": "Dartmoor Challenge Route",
-   "difficulty": "Hard",
-   "length": 15.8,
-   "est_time_min": 300,
-   "est_time_max": 420,
-   "route_type": "Point-to-point",
-   "user_id": 1,
-   "is_public": true
+      "trail_name": "Dartmoor Challenge Route",
+      "difficulty": "Hard",
+      "length": 15.8,
+      "est_time_min": 300,
+      "est_time_max": 420,
+      "route_type": "Point-to-point",
+      "user_id": 1,
+      "is_public": true
    }
 
    Update Trail (PUT):
    {
-   "trail_name": "Updated Trail Name",
-   "location_id": 2,
-   "difficulty": "Moderate",
-   "length": 4.5,
-   "elevation_gain": 150,
-   "est_time_min": 100,
-   "est_time_max": 150,
-   "route_type": "Loop",
-   "description": "Updated description of the trail.",
-   "is_public": false
+      "trail_name": "Updated Trail Name",
+      "location_id": 2,
+      "difficulty": "Moderate",
+      "length": 4.5,
+      "elevation_gain": 150,
+      "est_time_min": 100,
+      "est_time_max": 150,
+      "route_type": "Loop",
+      "description": "Updated description of the trail.",
+      "is_public": false
    }
 
    Delete Trali (DELETE): No JSON body needed
 
    Create Location (POST):
    {
-   "location_name": "Plymbridge Woods",
-   "city_id": 1,
-   "country_id": 1,
-   "coordinates": "50.3964,-4.0916"
+      "location_name": "Plymbridge Woods",
+      "city_id": 1,
+      "country_id": 1,
+      "coordinates": "50.3964,-4.0916"
    }
 
    Get Locations (GET): No JSON body needed
@@ -93,7 +93,7 @@ MAL2018 Information Management &amp; Retrieval - COMP2001 Assessment 2 [Trail Mi
 
    Update User Role (PUT):
    {
-   "role": "admin"
+      "role": "admin"
    }
 
    Get User Trails (GET): No JSON body needed
