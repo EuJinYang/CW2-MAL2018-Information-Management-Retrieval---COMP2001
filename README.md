@@ -1,5 +1,7 @@
 # CW2 MAL2018 Information Management Retrieval - COMP2001
 MAL2018 Information Management &amp; Retrieval - COMP2001 Assessment 2 [Trail Micro-Service]
+Author: Eu Jin Yang
+Programme of Study: BSc (Hons) Computer Science (Software Engineering)
 
 ## Quick Start Guide
 
@@ -9,6 +11,8 @@ MAL2018 Information Management &amp; Retrieval - COMP2001 Assessment 2 [Trail Mi
 - ODBC Driver 17 for SQL Server
 - External Authenticator API access
 - Azure Data Studio
+- FastAPI
+- Swagger
 
 ### Installation & Running
 1. **Clone and setup:**
@@ -33,3 +37,4 @@ MAL2018 Information Management &amp; Retrieval - COMP2001 Assessment 2 [Trail Mi
    Swagger Documentation: http://localhost:5000/docs
 
    FastAPI Documentation: http://localhost:5000/redocs
+
