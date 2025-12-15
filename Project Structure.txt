@@ -36,8 +36,8 @@ trail_service/
 │   ├── openapi.yaml
 │   ├── openapi.json
 │   ├── API_GUIDE.md
-│   └── sequence_diagrams/ [Haven't Create]
-│       └── trail_creation.puml
+│   ├── Logical ERD.png
+│   └── UML Class Diagram.png
 ├── tests/
 │   ├── test_models.py
 │   ├── test_endpoints.py
