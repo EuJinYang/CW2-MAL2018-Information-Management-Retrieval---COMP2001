@@ -1,0 +1,49 @@
+trail_service/
+├── templates/
+│   └── home.html
+├── scripts/
+│   └── seed_database.py
+├── src/
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── base.py
+│   │   ├── location.py
+│   │   ├── user.py
+│   │   ├── trail.py
+│   │   └── feature.py
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── app.py
+│   │   ├── auth.py
+│   │   ├── endpoints/
+│   │   │   ├── __init__.py
+│   │   │   ├── auth_endpoints.py
+│   │   │   ├── trail_endpoints.py
+│   │   │   ├── location_endpoints.py
+│   │   │   └── user_endpoints.py
+│   │   └── swagger.py
+│   ├── database/
+│   │   ├── __init__.py
+│   │   ├── connection.py
+│   │   ├── queries.py
+│   │   └── models.py
+│   └── utils/
+│       ├── __init__.py
+│       ├── validation.py
+│       ├── security.py
+│       └── logger.py
+├── docs/
+│   ├── openapi.yaml
+│   ├── openapi.json
+│   ├── API_GUIDE.md
+│   └── sequence_diagrams/ [Haven't Create]
+│       └── trail_creation.puml
+├── tests/
+│   ├── test_models.py
+│   ├── test_endpoints.py
+│   └── conftest.py
+├── requirements.txt
+├── .env.txt
+├── config.py
+├── run.py
+└── README.md [Pending Adjustment]

@@ -1,0 +1,1221 @@
+components:
+  schemas:
+    Body_login_api_v1_auth_login_post:
+      properties:
+        email:
+          title: Email
+          type: string
+        password:
+          title: Password
+          type: string
+      required:
+      - email
+      - password
+      title: Body_login_api_v1_auth_login_post
+      type: object
+    Body_register_user_api_v1_auth_register_post:
+      properties:
+        email:
+          title: Email
+          type: string
+        password:
+          title: Password
+          type: string
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      required:
+      - email
+      - password
+      title: Body_register_user_api_v1_auth_register_post
+      type: object
+    Body_test_credentials_api_v1_auth_test_post:
+      properties:
+        email:
+          title: Email
+          type: string
+        password:
+          title: Password
+          type: string
+      required:
+      - email
+      - password
+      title: Body_test_credentials_api_v1_auth_test_post
+      type: object
+    Difficulty:
+      enum:
+      - Easy
+      - Moderate
+      - Hard
+      title: Difficulty
+      type: string
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    LoginResponse:
+      properties:
+        access_token:
+          title: Access Token
+          type: string
+        expires_in:
+          title: Expires In
+          type: integer
+        message:
+          title: Message
+          type: string
+        token_type:
+          title: Token Type
+          type: string
+        user:
+          additionalProperties: true
+          title: User
+          type: object
+      required:
+      - access_token
+      - token_type
+      - expires_in
+      - user
+      - message
+      title: LoginResponse
+      type: object
+    LogoutResponse:
+      properties:
+        message:
+          title: Message
+          type: string
+        user_id:
+          title: User Id
+          type: integer
+      required:
+      - message
+      - user_id
+      title: LogoutResponse
+      type: object
+    RegisterResponse:
+      properties:
+        access_token:
+          title: Access Token
+          type: string
+        message:
+          title: Message
+          type: string
+        token_type:
+          title: Token Type
+          type: string
+        user:
+          additionalProperties: true
+          title: User
+          type: object
+      required:
+      - access_token
+      - token_type
+      - user
+      - message
+      title: RegisterResponse
+      type: object
+    TestResponse:
+      properties:
+        email:
+          title: Email
+          type: string
+        message:
+          title: Message
+          type: string
+        valid:
+          title: Valid
+          type: boolean
+      required:
+      - valid
+      - message
+      - email
+      title: TestResponse
+      type: object
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    VerifyResponse:
+      properties:
+        user:
+          additionalProperties: true
+          title: User
+          type: object
+        valid:
+          title: Valid
+          type: boolean
+      required:
+      - valid
+      - user
+      title: VerifyResponse
+      type: object
+  securitySchemes:
+    BearerAuth:
+      bearerFormat: JWT
+      description: Enter session token obtained from authentication
+      scheme: bearer
+      type: http
+info:
+  description: Microservice for managing hiking trails in a wellbeing application
+  title: TrailService API
+  version: 1.0.0
+  x-logo:
+    altText: TrailService Logo
+    url: https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png
+openapi: 3.1.0
+paths:
+  /api/v1/auth/login:
+    post:
+      description: Authenticate user with external API and create session
+      operationId: login_api_v1_auth_login_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Body_login_api_v1_auth_login_post'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          description: Successful Response
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Invalid email or password
+          description: Unauthorized - Invalid credentials
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      summary: Login
+      tags:
+      - Authentication
+  /api/v1/auth/logout:
+    post:
+      description: Logout user - client should discard token
+      operationId: logout_api_v1_auth_logout_post
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutResponse'
+          description: Successful Response
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Invalid or expired token
+          description: Unauthorized - Invalid or expired token
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Logout
+      tags:
+      - Authentication
+  /api/v1/auth/register:
+    post:
+      description: 'Register a new user (using external authentication)
+
+        Note: The external API doesn''t have registration, so this just creates a
+        local user
+
+        after verifying credentials are valid'
+      operationId: register_user_api_v1_auth_register_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Body_register_user_api_v1_auth_register_post'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+          description: Successful Response
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Invalid email or password
+          description: Unauthorized - Invalid credentials
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      summary: Register User
+      tags:
+      - Authentication
+  /api/v1/auth/test:
+    post:
+      description: Test credentials without creating a session
+      operationId: test_credentials_api_v1_auth_test_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Body_test_credentials_api_v1_auth_test_post'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestResponse'
+          description: Successful Response
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Invalid email or password
+          description: Unauthorized - Invalid credentials
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      summary: Test Credentials
+      tags:
+      - Authentication
+  /api/v1/auth/verify:
+    get:
+      description: Verify current session is valid
+      operationId: verify_session_api_v1_auth_verify_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyResponse'
+          description: Successful Response
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Invalid or expired token
+          description: Unauthorized - Invalid or expired token
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Verify Session
+      tags:
+      - Authentication
+  /api/v1/countries:
+    get:
+      description: Get all countries with optional filtering - PUBLIC ENDPOINT
+      operationId: get_countries_api_v1_countries_get
+      parameters:
+      - description: Filter by country name
+        in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by country name
+          title: Name
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  additionalProperties: true
+                  type: object
+                title: Response Get Countries Api V1 Countries Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      summary: Get Countries
+      tags:
+      - Locations
+  /api/v1/countries/{country_id}/cities:
+    get:
+      description: Get cities for a specific country - PUBLIC ENDPOINT
+      operationId: get_cities_by_country_api_v1_countries__country_id__cities_get
+      parameters:
+      - in: path
+        name: country_id
+        required: true
+        schema:
+          title: Country Id
+          type: integer
+      - description: Filter by city name
+        in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by city name
+          title: Name
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  additionalProperties: true
+                  type: object
+                title: Response Get Cities By Country Api V1 Countries  Country Id  Cities
+                  Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      summary: Get Cities By Country
+      tags:
+      - Locations
+  /api/v1/locations:
+    get:
+      description: Get all locations with filtering - PUBLIC ENDPOINT
+      operationId: get_locations_api_v1_locations_get
+      parameters:
+      - description: Filter by city
+        in: query
+        name: city_id
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          description: Filter by city
+          title: City Id
+      - description: Filter by country
+        in: query
+        name: country_id
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          description: Filter by country
+          title: Country Id
+      - description: Filter by location name
+        in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by location name
+          title: Name
+      - in: query
+        name: limit
+        required: false
+        schema:
+          default: 50
+          maximum: 100
+          minimum: 1
+          title: Limit
+          type: integer
+      - in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          minimum: 0
+          title: Offset
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  additionalProperties: true
+                  type: object
+                title: Response Get Locations Api V1 Locations Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      summary: Get Locations
+      tags:
+      - Locations
+    post:
+      description: Create a new location (admin only)
+      operationId: create_location_api_v1_locations_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              title: Location Data
+              type: object
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Invalid or expired token
+          description: Unauthorized - Invalid or expired token
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Create Location
+      tags:
+      - Locations
+  /api/v1/locations/{location_id}:
+    get:
+      description: Get location by ID - PUBLIC ENDPOINT
+      operationId: get_location_api_v1_locations__location_id__get
+      parameters:
+      - in: path
+        name: location_id
+        required: true
+        schema:
+          title: Location Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                title: Response Get Location Api V1 Locations  Location Id  Get
+                type: object
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      summary: Get Location
+      tags:
+      - Locations
+  /api/v1/trails:
+    get:
+      description: 'Get all public trails with optional filtering
+
+        # Public users: see only public trails
+
+        # Authenticated users: see public trails + their own private trails'
+      operationId: get_trails_api_v1_trails_get
+      parameters:
+      - description: Filter by difficulty
+        in: query
+        name: difficulty
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/Difficulty'
+          - type: 'null'
+          description: Filter by difficulty
+          title: Difficulty
+      - description: Minimum trail length in km
+        in: query
+        name: min_length
+        required: false
+        schema:
+          anyOf:
+          - minimum: 0.1
+            type: number
+          - type: 'null'
+          description: Minimum trail length in km
+          title: Min Length
+      - description: Maximum trail length in km
+        in: query
+        name: max_length
+        required: false
+        schema:
+          anyOf:
+          - minimum: 0.1
+            type: number
+          - type: 'null'
+          description: Maximum trail length in km
+          title: Max Length
+      - description: Filter by location
+        in: query
+        name: location_id
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          description: Filter by location
+          title: Location Id
+      - description: Number of trails to return
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 20
+          description: Number of trails to return
+          maximum: 100
+          minimum: 1
+          title: Limit
+          type: integer
+      - description: Offset for pagination
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          description: Offset for pagination
+          minimum: 0
+          title: Offset
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                title: Response Get Trails Api V1 Trails Get
+                type: object
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - HTTPBearer: []
+      summary: Get Trails
+      tags:
+      - Trails
+    post:
+      description: Create a new trail
+      operationId: create_trail_api_v1_trails_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              title: Trail Data
+              type: object
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                title: Response Create Trail Api V1 Trails Post
+                type: object
+          description: Successful Response
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Invalid or expired token
+          description: Unauthorized - Invalid or expired token
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Create Trail
+      tags:
+      - Trails
+  /api/v1/trails/{trail_id}:
+    delete:
+      description: Delete a trail
+      operationId: delete_trail_api_v1_trails__trail_id__delete
+      parameters:
+      - in: path
+        name: trail_id
+        required: true
+        schema:
+          title: Trail Id
+          type: integer
+      responses:
+        '204':
+          description: Successful Response
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Invalid or expired token
+          description: Unauthorized - Invalid or expired token
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Delete Trail
+      tags:
+      - Trails
+    get:
+      description: 'Get detailed information about a specific trail
+
+        # Public: can view public trails only
+
+        # Authenticated: can view public trails + own private trails'
+      operationId: get_trail_api_v1_trails__trail_id__get
+      parameters:
+      - in: path
+        name: trail_id
+        required: true
+        schema:
+          title: Trail Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                title: Response Get Trail Api V1 Trails  Trail Id  Get
+                type: object
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - HTTPBearer: []
+      summary: Get Trail
+      tags:
+      - Trails
+    put:
+      description: Update an existing trail
+      operationId: update_trail_api_v1_trails__trail_id__put
+      parameters:
+      - in: path
+        name: trail_id
+        required: true
+        schema:
+          title: Trail Id
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              title: Trail Data
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                title: Response Update Trail Api V1 Trails  Trail Id  Put
+                type: object
+          description: Successful Response
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Invalid or expired token
+          description: Unauthorized - Invalid or expired token
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Update Trail
+      tags:
+      - Trails
+  /api/v1/trails/{trail_id}/points:
+    get:
+      description: 'Get all points for a specific trail
+
+        # Public: can view points of public trails
+
+        # Authenticated: can view points of public trails + own private trails'
+      operationId: get_trail_points_api_v1_trails__trail_id__points_get
+      parameters:
+      - in: path
+        name: trail_id
+        required: true
+        schema:
+          title: Trail Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  additionalProperties: true
+                  type: object
+                title: Response Get Trail Points Api V1 Trails  Trail Id  Points Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - HTTPBearer: []
+      summary: Get Trail Points
+      tags:
+      - Trails
+    post:
+      description: Add a new point to a trail
+      operationId: add_trail_point_api_v1_trails__trail_id__points_post
+      parameters:
+      - in: path
+        name: trail_id
+        required: true
+        schema:
+          title: Trail Id
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              title: Point Data
+              type: object
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Invalid or expired token
+          description: Unauthorized - Invalid or expired token
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Add Trail Point
+      tags:
+      - Trails
+  /api/v1/users:
+    get:
+      description: Get all users (admin only)
+      operationId: get_users_api_v1_users_get
+      parameters:
+      - description: Filter by role
+        in: query
+        name: role
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by role
+          title: Role
+      - description: Search by username or email
+        in: query
+        name: search
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Search by username or email
+          title: Search
+      - in: query
+        name: limit
+        required: false
+        schema:
+          default: 20
+          maximum: 100
+          minimum: 1
+          title: Limit
+          type: integer
+      - in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          minimum: 0
+          title: Offset
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  additionalProperties: true
+                  type: object
+                title: Response Get Users Api V1 Users Get
+                type: array
+          description: Successful Response
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Invalid or expired token
+          description: Unauthorized - Invalid or expired token
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get Users
+      tags:
+      - Users
+  /api/v1/users/me:
+    get:
+      description: Get current user's profile  - PROTECTED ENDPOINT
+      operationId: get_current_user_profile_api_v1_users_me_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                title: Response Get Current User Profile Api V1 Users Me Get
+                type: object
+          description: Successful Response
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - HTTPBearer: []
+      summary: Get Current User Profile
+      tags:
+      - Users
+  /api/v1/users/{user_id}:
+    get:
+      description: 'Get user by ID
+
+        # Public: basic info only (username, public stats)
+
+        # Self/Admin: full info'
+      operationId: get_user_by_id_api_v1_users__user_id__get
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          title: User Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                title: Response Get User By Id Api V1 Users  User Id  Get
+                type: object
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - HTTPBearer: []
+      summary: Get User By Id
+      tags:
+      - Users
+  /api/v1/users/{user_id}/role:
+    put:
+      description: Update user role (admin only)
+      operationId: update_user_role_api_v1_users__user_id__role_put
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          title: User Id
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              title: Role Data
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                title: Response Update User Role Api V1 Users  User Id  Role Put
+                type: object
+          description: Successful Response
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Invalid or expired token
+          description: Unauthorized - Invalid or expired token
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Update User Role
+      tags:
+      - Users
+  /api/v1/users/{user_id}/trails:
+    get:
+      description: 'Get trails created by a specific user
+
+        # Public: public trails only
+
+        # Self/Admin: can include private trails if requested'
+      operationId: get_user_trails_api_v1_users__user_id__trails_get
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          title: User Id
+          type: integer
+      - description: Include private trails (admin or owner only)
+        in: query
+        name: include_private
+        required: false
+        schema:
+          default: false
+          description: Include private trails (admin or owner only)
+          title: Include Private
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  additionalProperties: true
+                  type: object
+                title: Response Get User Trails Api V1 Users  User Id  Trails Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '500':
+          content:
+            application/json:
+              example:
+                detail: Internal server error occurred
+          description: Internal Server Error
+      security:
+      - HTTPBearer: []
+      summary: Get User Trails
+      tags:
+      - Users
+tags:
+- description: User authentication and session management
+  name: Authentication
+- description: Trail management operations. Create, read, update, and delete hiking
+    trails.
+  name: Trails
+- description: Location management for trails (countries, cities, specific locations).
+  name: Locations
+- description: User profile and management operations.
+  name: Users
+- description: Health check and service status endpoints.
+  name: Health

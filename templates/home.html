@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ service }} - v{{ version }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            --trail-green: #27ae60;
+            --mountain-blue: #2980b9;
+        }
+
+        body {
+            background: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .hero-section {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2rem 0 4rem 0;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 3rem;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 5px solid var(--trail-green);
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .endpoint-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .endpoint-card:hover {
+            border-color: var(--mountain-blue);
+            background: #e3f2fd;
+        }
+
+        .endpoint-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 0.25rem 1rem;
+        }
+
+        .api-test-btn {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+
+        .api-test-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(41, 128, 185, 0.3);
+        }
+
+        .response-box {
+            background: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-radius: 30px 30px 0 0;
+        }
+
+        .feature-icon {
+            color: var(--trail-green);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .auth-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-4 fw-bold">
+                        <i class="fas fa-mountain"></i> {{ service }}
+                    </h1>
+                    <p class="lead">{{ description }}</p>
+                    <div class="d-flex gap-2 align-items-center">
+                        <span class="badge bg-light text-dark">v{{ version }}</span>
+                        <span class="badge bg-success status-badge">
+                            <i class="fas fa-circle me-1"></i> {{ status|upper }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="fas fa-hiking" style="font-size: 8rem; opacity: 0.8;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Authentication Section -->
+        <div class="service-card" id="auth-section">
+            <div class="text-center mb-4">
+                <h3>
+                    <i class="fas fa-sign-in-alt me-2"></i> Authentication
+                </h3>
+            </div>
+
+            <!-- Login Form (shown when not logged in) -->
+            <div id="login-form">
+                <p class="text-center">Login with external authentication service</p>
+                <div class="mb-3">
+                    <label for="login-email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="login-email"
+                        placeholder="Enter Email (e.g. name@plymouth.ac.uk)">
+                </div>
+                <div class="mb-3">
+                    <label for="login-password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="login-password" placeholder="Enter Password">
+                </div>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="login()">
+                        <i class="fas fa-sign-in-alt me-2"></i> Login
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="testCredentials()">
+                        <i class="fas fa-vial me-2"></i> Test Credentials Only
+                    </button>
+                </div>
+
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Using external authentication
+                    </small>
+                </div>
+            </div>
+
+            <!-- Logged In Info (shown when logged in) -->
+            <div id="logged-in-info" style="display: none;">
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Logged in as:</strong>
+                    <span id="logged-email"></span>
+                </div>
+
+                <div class="alert alert-info mb-3" id="user-role">
+                    <i class="fas fa-user-tag me-2"></i>
+                    <strong>Role:</strong>
+                    <span id="role-text">user</span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Session Token</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="current-token" readonly>
+                        <button class="btn btn-outline-secondary" onclick="toggleTokenVisibility()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-success" onclick="copyToken()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted">Valid for 24 hours</small>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-danger" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </button>
+                    <button class="btn btn-outline-info" onclick="verifySession()">
+                        <i class="fas fa-shield-alt me-2"></i> Verify Session
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Overview -->
+        <div class="service-card">
+            <h3 class="mb-4">
+                <i class="fas fa-info-circle me-2"></i> Service Overview
+            </h3>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="feature-icon">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <h5>Trail Management</h5>
+                    <p class="text-muted">Create, read, update, and delete trail information with comprehensive details.
+                    </p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h5>Location Services</h5>
+                    <p class="text-muted">Manage geographical data, coordinates, and location-based features.</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="feature-icon">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <h5>User Management</h5>
+                    <p class="text-muted">Secure authentication and authorization for system users.</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="feature-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h5>API Documentation</h5>
+                    <p class="text-muted">Comprehensive OpenAPI/Swagger documentation for all endpoints.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Endpoints -->
+        <div class="service-card">
+            <div class="text-center mb-4">
+                <h3>
+                    <i class="fas fa-plug me-2"></i> Available Endpoints
+                </h3>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="endpoint-card" onclick="openSwaggerWithToken()">
+                        <div class="d-flex align-items-center">
+                            <div class="endpoint-icon me-3">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold">API Documentation</h6>
+                                <p class="text-muted mb-0 small">/docs</p>
+                                <span class="badge bg-info">GET</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="endpoint-card" onclick="showEndpointInModal('/api')">
+                        <div class="d-flex align-items-center">
+                            <div class="endpoint-icon me-3">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold">API Information</h6>
+                                <p class="text-muted mb-0 small">/api</p>
+                                <span class="badge bg-primary">GET</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="endpoint-card" onclick="showEndpointInModal('/health')">
+                        <div class="d-flex align-items-center">
+                            <div class="endpoint-icon me-3">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Health Check</h6>
+                                <p class="text-muted mb-0 small">/health</p>
+                                <span class="badge bg-success">GET</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="endpoint-card" onclick="showEndpointInModal('/api/v1/trails')">
+                        <div class="d-flex align-items-center">
+                            <div class="endpoint-icon me-3">
+                                <i class="fas fa-route"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Trails API</h6>
+                                <p class="text-muted mb-0 small">/api/v1/trails</p>
+                                <span class="badge bg-warning">GET</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="endpoint-card" onclick="showEndpointInModal('/api/v1/locations')">
+                        <div class="d-flex align-items-center">
+                            <div class="endpoint-icon me-3">
+                                <i class="fas fa-map-marked-alt"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Locations API</h6>
+                                <p class="text-muted mb-0 small">/api/v1/locations</p>
+                                <span class="badge bg-info">GET</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="endpoint-card" onclick="showEndpointInModal('/api/v1/users')">
+                        <div class="d-flex align-items-center">
+                            <div class="endpoint-icon me-3">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Users API</h6>
+                                <p class="text-muted mb-0 small">/api/v1/users</p>
+                                <span class="badge bg-secondary">GET</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Endpoint Modal -->
+        <div class="modal fade" id="endpointModal" tabindex="-1" aria-labelledby="endpointModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header"
+                        style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white;">
+                        <h5 class="modal-title" id="endpointModalTitle">API Response</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <pre id="endpointModalContent"
+                            style="margin: 0; font-family: 'Courier New', monospace; white-space: pre-wrap; word-wrap: break-word;"></pre>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i> Close
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="copyModalContent()">
+                            <i class="fas fa-copy me-1"></i> Copy Response
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Testing -->
+        <div class="service-card">
+            <h3 class="mb-4">
+                <i class="fas fa-vial me-2"></i> API Testing
+            </h3>
+            <div class="mb-3">
+                <p>Test API endpoints directly from this interface:</p>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <button class="api-test-btn" onclick="testEndpoint('/api')">
+                        <i class="fas fa-code me-2"></i> Test API Info
+                    </button>
+                    <button class="api-test-btn" onclick="testEndpoint('/health')">
+                        <i class="fas fa-heartbeat me-2"></i> Test Health
+                    </button>
+                    <button class="api-test-btn" onclick="testEndpoint('/api/v1/trails')">
+                        <i class="fas fa-route me-2"></i> Test Trails
+                    </button>
+                    <button class="api-test-btn" onclick="testEndpoint('/api/v1/locations')">
+                        <i class="fas fa-map-marked-alt me-2"></i> Test Locations
+                    </button>
+                    <button class="api-test-btn" onclick="testEndpoint('/api/v1/users')">
+                        <i class="fas fa-users me-2"></i> Test Users
+                    </button>
+                </div>
+            </div>
+            <div id="api-response" class="response-box"></div>
+        </div>
+
+        <!-- System Status -->
+        <div class="service-card">
+            <h3 class="mb-4">
+                <i class="fas fa-server me-2"></i> System Status
+            </h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <h6>Service Status</h6>
+                        <div class="d-flex align-items-center">
+                            <div class="me-2">
+                                <i class="fas fa-circle text-success"></i>
+                            </div>
+                            <div>
+                                <strong>{{ status|upper }}</strong>
+                                <div class="text-muted small">All systems operational</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <h6>Current Time</h6>
+                        <div class="d-flex align-items-center">
+                            <div class="me-2">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <strong id="current-time"></strong>
+                                <div class="text-muted small">Server time</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-mountain"></i> Trail Service Microservice</h5>
+                    <p class="mb-0">Version {{ version }} • {{ status|capitalize }}</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">
+                        <i class="fas fa-bolt me-1"></i> Built with FastAPI & Python
+                    </p>
+                    <p class="mb-0 small">
+                        <i class="fas fa-database me-1"></i> Database: Ready
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let authToken = localStorage.getItem('trail-service-token') || '';
+        let currentUser = JSON.parse(localStorage.getItem('trail-service-user') || 'null');
+
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            };
+            document.getElementById('current-time').textContent = now.toLocaleString('en-US', options);
+        }
+
+        // Update UI based on login state
+        function updateAuthUI() {
+            const loginForm = document.getElementById('login-form');
+            const loggedInInfo = document.getElementById('logged-in-info');
+
+            if (authToken && currentUser) {
+                loginForm.style.display = 'none';
+                loggedInInfo.style.display = 'block';
+                document.getElementById('logged-email').textContent = currentUser.email;
+                document.getElementById('user-role').textContent = currentUser.role || 'user';
+                document.getElementById('current-token').value = authToken;
+
+                const roleBadge = document.getElementById('user-role');
+                if (currentUser.role === 'admin') {
+                    roleBadge.classList.remove('alert-info');
+                    roleBadge.classList.add('alert-danger', 'fw-bold');
+                    roleBadge.innerHTML = `<i class="fas fa-crown me-2"></i><strong>Role:</strong> ADMIN`;
+                } else if (currentUser.role === 'moderator') {
+                    roleBadge.classList.remove('alert-info');
+                    roleBadge.classList.add('alert-warning', 'fw-bold');
+                    roleBadge.innerHTML = `<i class="fas fa-shield-alt me-2"></i><strong>Role:</strong> MODERATOR`;
+                } else {
+                    roleBadge.classList.remove('alert-danger', 'alert-warning', 'fw-bold');
+                    roleBadge.classList.add('alert-info');
+                    roleBadge.innerHTML = `<i class="fas fa-user me-2"></i><strong>Role:</strong> USER`;
+                }
+
+                // Update endpoint badges to show protected status
+                document.querySelectorAll('.endpoint-card .badge').forEach(badge => {
+                    if (badge.textContent.includes('GET') || badge.textContent.includes('POST')) {
+                        badge.classList.remove('bg-secondary', 'bg-warning', 'bg-info', 'bg-primary', 'bg-success');
+                        badge.classList.add('bg-success');
+                        if (!badge.innerHTML.includes('fa-lock')) {
+                            badge.innerHTML = `<i class="fas fa-lock me-1"></i> ${badge.textContent}`;
+                        }
+                    }
+                });
+            } else {
+                loginForm.style.display = 'block';
+                loggedInInfo.style.display = 'none';
+
+                // Update endpoint badges to show public status
+                document.querySelectorAll('.endpoint-card .badge').forEach(badge => {
+                    badge.innerHTML = badge.innerHTML.replace(/<i class="fas fa-lock me-1"><\/i>/g, '');
+                });
+            }
+        }
+
+        // Login function
+        async function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const responseElement = document.getElementById('api-response');
+
+            if (!email || !password) {
+                showAlert('warning', 'Please enter both email and password');
+                return;
+            }
+
+            try {
+                responseElement.style.display = 'block';
+                responseElement.textContent = 'Authenticating with external service...';
+
+                const formData = new FormData();
+                formData.append('email', email);
+                formData.append('password', password);
+
+                const response = await fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.access_token;
+                    currentUser = data.user;
+
+                    // Store in localStorage
+                    localStorage.setItem('trail-service-token', authToken);
+                    localStorage.setItem('trail-service-user', JSON.stringify(currentUser));
+
+                    // Update UI
+                    updateAuthUI();
+
+                    responseElement.textContent = `Login successful!\n\nWelcome ${currentUser.username}!\nToken expires in 24 hours`;
+                    responseElement.style.color = '#27ae60';
+
+                    showAlert('success', `Welcome ${currentUser.username}!`);
+
+                } else {
+                    const error = await response.json();
+                    responseElement.textContent = `Login failed: ${error.detail || 'Unknown error'}`;
+                    responseElement.style.color = '#e74c3c';
+                    showAlert('danger', 'Login failed. Check credentials.');
+                }
+
+            } catch (error) {
+                responseElement.textContent = `Error: ${error.message}`;
+                responseElement.style.color = '#e74c3c';
+                showAlert('danger', 'Connection error');
+            }
+        }
+
+        // Test credentials without login
+        async function testCredentials() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const responseElement = document.getElementById('api-response');
+
+            if (!email || !password) {
+                showAlert('warning', 'Please enter both email and password');
+                return;
+            }
+
+            try {
+                responseElement.style.display = 'block';
+                responseElement.textContent = 'Testing credentials...';
+
+                const formData = new FormData();
+                formData.append('email', email);
+                formData.append('password', password);
+
+                const response = await fetch('/api/v1/auth/test', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    responseElement.textContent = `Credentials are valid!\n\nEmail: ${data.email}`;
+                    responseElement.style.color = '#27ae60';
+                    showAlert('success', 'Credentials are valid!');
+                } else {
+                    const error = await response.json();
+                    responseElement.textContent = `Invalid credentials: ${error.detail}`;
+                    responseElement.style.color = '#e74c3c';
+                    showAlert('danger', 'Invalid credentials');
+                }
+
+            } catch (error) {
+                responseElement.textContent = `Error: ${error.message}`;
+                responseElement.style.color = '#e74c3c';
+                showAlert('danger', 'Connection error');
+            }
+        }
+
+        // Logout function
+        async function logout() {
+            try {
+                // Call logout endpoint if we have a token
+                if (authToken) {
+                    const response = await fetch('/api/v1/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        console.warn('Logout endpoint failed, but clearing local session anyway');
+                    }
+                }
+            } catch (error) {
+                console.warn('Error calling logout endpoint:', error);
+            }
+
+            // Clear local session
+            authToken = '';
+            currentUser = null;
+            localStorage.removeItem('trail-service-token');
+            localStorage.removeItem('trail-service-user');
+            updateAuthUI();
+            showAlert('info', 'Logged out successfully');
+        }
+
+        // Verify session
+        async function verifySession() {
+            const responseElement = document.getElementById('api-response');
+
+            try {
+                responseElement.style.display = 'block';
+                responseElement.textContent = 'Verifying session...';
+
+                const response = await fetch('/api/v1/auth/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    responseElement.textContent = `Session valid!\n\n${JSON.stringify(data, null, 2)}`;
+                    responseElement.style.color = '#27ae60';
+                } else {
+                    responseElement.textContent = `Session invalid or expired. Status: ${response.status}`;
+                    responseElement.style.color = '#e74c3c';
+
+                    // Auto-logout if session is invalid
+                    logout();
+                }
+            } catch (error) {
+                responseElement.textContent = `Error: ${error.message}`;
+                responseElement.style.color = '#e74c3c';
+            }
+        }
+
+        // Toggle token visibility
+        function toggleTokenVisibility() {
+            const tokenInput = document.getElementById('current-token');
+            tokenInput.type = tokenInput.type === 'password' ? 'text' : 'password';
+        }
+
+        // Copy token to clipboard
+        function copyToken() {
+            const tokenInput = document.getElementById('current-token');
+            tokenInput.select();
+            document.execCommand('copy');
+            showAlert('success', 'Token copied to clipboard!');
+        }
+
+        // Check if endpoint requires admin access
+        function requiresAdminAccess(url) {
+            const adminEndpoints = [
+                '/api/v1/users',
+                '/api/v1/trails',
+                '/api/v1/locations'
+            ];
+            return adminEndpoints.some(endpoint => url === endpoint);
+        }
+
+        // Check if endpoint requires authentication
+        function requiresAuth(url) {
+            const protectedEndpoints = [
+                '/api/v1/users',
+                '/api/v1/trails',
+                '/api/v1/locations'
+            ];
+            return protectedEndpoints.some(endpoint => url === endpoint);
+        }
+
+        // Show endpoint in modal with authentication check
+        async function showEndpointInModal(url) {
+            // Check if endpoint requires authentication
+            if (requiresAuth(url) && !authToken) {
+                if (confirm('This endpoint requires authentication. Would you like to login first?')) {
+                    document.getElementById('login-email').focus();
+                    return;
+                } else {
+                    return;
+                }
+            }
+
+            // Check if endpoint requires admin access
+            if (requiresAdminAccess(url) && currentUser && currentUser.role !== 'admin') {
+                showAlert('danger', 'This endpoint requires admin privileges.');
+                return;
+            }
+
+            try {
+                const headers = {};
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+
+                // Show loading
+                const modal = new bootstrap.Modal(document.getElementById('endpointModal'));
+                document.getElementById('endpointModalTitle').textContent = `GET ${url}`;
+                document.getElementById('endpointModalContent').textContent = 'Loading...';
+                modal.show();
+
+                // Fetch data
+                const response = await fetch(url, { headers });
+                const contentType = response.headers.get('content-type');
+
+                // Handle different response types
+                let data;
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    data = await response.text();
+                }
+
+                // Update modal
+                const title = document.getElementById('endpointModalTitle');
+                const content = document.getElementById('endpointModalContent');
+
+                title.textContent = `GET ${url} (Status: ${response.status})`;
+
+                if (typeof data === 'object') {
+                    content.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    content.textContent = data;
+                }
+
+                // Color code based on status
+                if (response.ok) {
+                    content.style.color = '#27ae60';
+                } else {
+                    content.style.color = '#e74c3c';
+                }
+
+            } catch (error) {
+                const title = document.getElementById('endpointModalTitle');
+                const content = document.getElementById('endpointModalContent');
+
+                title.textContent = 'Error';
+                content.textContent = `Error fetching ${url}: ${error.message}`;
+                content.style.color = '#e74c3c';
+            }
+        }
+
+        // Copy modal content to clipboard
+        function copyModalContent() {
+            const content = document.getElementById('endpointModalContent').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                showAlert('success', 'Response copied to clipboard!');
+            });
+        }
+
+        // Test API endpoint (for API Testing section - with confirmation)
+        async function testEndpoint(url) {
+            // Check if endpoint requires authentication
+            if (requiresAuth(url) && !authToken) {
+                if (confirm('This endpoint requires authentication. Would you like to login first?')) {
+                    document.getElementById('login-email').focus();
+                    return;
+                } else {
+                    return;
+                }
+            }
+
+            // Check if endpoint requires admin access
+            if (requiresAdminAccess(url) && currentUser && currentUser.role !== 'admin') {
+                showAlert('danger', 'This endpoint requires admin privileges.');
+                return;
+            }
+
+            const responseElement = document.getElementById('api-response');
+
+            try {
+                responseElement.style.display = 'block';
+                responseElement.textContent = `Fetching ${url}...`;
+
+                const headers = {};
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+
+                const response = await fetch(url, { headers });
+                const contentType = response.headers.get('content-type');
+
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    responseElement.textContent = `Status: ${response.status}\n\n${JSON.stringify(data, null, 2)}`;
+                    responseElement.style.color = response.ok ? '#27ae60' : '#e74c3c';
+                } else {
+                    const text = await response.text();
+                    responseElement.textContent = `Status: ${response.status}\n\n${text}`;
+                    responseElement.style.color = response.ok ? '#3498db' : '#e74c3c';
+                }
+
+                // Scroll to response
+                responseElement.scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                responseElement.textContent = `Error: ${error.message}`;
+                responseElement.style.color = '#e74c3c';
+            }
+        }
+
+        // Show alert function
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 1000; min-width: 300px;';
+            alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        `;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            updateTime();
+            setInterval(updateTime, 1000);
+
+            updateAuthUI();
+            if (authToken) {
+                // Auto-verify session on page load
+                setTimeout(verifySession, 1000);
+                showAlert('info', 'Session restored from storage');
+            }
+        });
+
+        // Function to open Swagger with current token
+        function openSwaggerWithToken() {
+            if (!authToken) {
+                if (confirm('You need to login first to use Swagger with authentication. Login now?')) {
+                    document.getElementById('login-email').focus();
+                }
+                return;
+            }
+
+            // Open Swagger in new tab
+            const swaggerUrl = '/docs';
+            const newWindow = window.open(swaggerUrl, '_blank');
+
+            // Show instructions
+            showAlert('info',
+                `Swagger opened. Click "Authorize" button (🔒) and enter: Bearer ${authToken.substring(0, 30)}...`);
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
