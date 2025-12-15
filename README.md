@@ -1,7 +1,7 @@
 # CW2 MAL2018 Information Management Retrieval - COMP2001
 MAL2018 Information Management &amp; Retrieval - COMP2001 Assessment 2 [Trail Micro-Service]
-Author: Eu Jin Yang
-Programme of Study: BSc (Hons) Computer Science (Software Engineering)
+<br> Author: Eu Jin Yang
+<br> Programme of Study: BSc (Hons) Computer Science (Software Engineering)
 
 ## Quick Start Guide
 
@@ -37,4 +37,5 @@ Programme of Study: BSc (Hons) Computer Science (Software Engineering)
    Swagger Documentation: http://localhost:5000/docs
 
    FastAPI Documentation: http://localhost:5000/redocs
+
 
