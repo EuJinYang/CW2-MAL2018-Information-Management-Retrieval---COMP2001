@@ -34,8 +34,11 @@ MAL2018 Information Management &amp; Retrieval - COMP2001 Assessment 2 [Trail Mi
 
 4. **Access the API**
    ```bash
+   Template (Home Page): http://localhost:5000
+   
    Swagger Documentation: http://localhost:5000/docs
 
    FastAPI Documentation: http://localhost:5000/redocs
+
 
 
