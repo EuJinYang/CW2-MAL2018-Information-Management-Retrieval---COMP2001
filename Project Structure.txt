@@ -42,8 +42,10 @@ trail_service/
 │   ├── test_models.py
 │   ├── test_endpoints.py
 │   └── conftest.py
-├── requirements.txt
 ├── .env.txt
+├── .gitignore
+├── Project Structure.txt
+├── README.md
 ├── config.py
-├── run.py
-└── README.md [Pending Adjustment]
+├── requirements.txt
+└── run.py
