@@ -39,5 +39,6 @@ MAL2018 Information Management &amp; Retrieval - COMP2001 Assessment 2 [Trail Mi
    
    Swagger Documentation: http://localhost:5000/docs
 
-   FastAPI Documentation: http://localhost:5000/redocs
+   FastAPI Documentation: http://localhost:5000/redoc
+
 
